@@ -18,7 +18,7 @@ You can see the full list of supported platforms [here](Platforms.md).\
 \
 **itch.io Username:** The account that you used to log in to butler.\
 **Game ID:** Project URL of the game.\
-**Game Name:** Name of the game that is used in the build names.
+**Game Name:** Name of the game that is used in the build names.\
 **Version:** Versions of the build that is also used in the build names.\
 \
 After filling out all these fields, select the butler executable and upload the builds with the **Upload Builds** button.
