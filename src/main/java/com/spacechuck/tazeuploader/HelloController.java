@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
+import java.util.ArrayList;
 
 import javafx.scene.control.*;
 import javafx.scene.Node;
@@ -42,29 +43,83 @@ public class HelloController {
         fileChooser.setTitle("Open Butler Executable");
         ButlerExec = fileChooser.showOpenDialog(stage);
         System.out.println(ButlerExec);
+        if (ButlerExec == null) {ButlerStatusBar.setProgress(0);return;}
+        try {
+            Process proc = Runtime.getRuntime().exec(new String[] {ButlerExec.getPath()});
+        } catch (Exception e) {
+            Alert a = new Alert(AlertType.ERROR);
+            a.setContentText(e.toString());
+            a.setHeaderText("that file doesnt work idiot");
+            a.setTitle("TazeUploader");
+            a.show();
+            ButlerExec = null;
+            ButlerStatusBar.setProgress(0);
+            return;
+        }
         ButlerStatusBar.setProgress(1);
     }
 
     @FXML
     protected void onUploadButtonClick(ActionEvent event) throws IOException, InterruptedException {
-        if (ButlerExec == null) {
+        if (UsernameBox.getText().isBlank()) {
             Alert a = new Alert(AlertType.ERROR);
-            a.setContentText("choose the butler executable idiot");
+            a.setHeaderText("enter your username idiot");
+            a.setTitle("TazeUploader");
             a.show();
             return;
         }
+        if (GameBox.getText().isBlank()) {
+            Alert a = new Alert(AlertType.ERROR);
+            a.setHeaderText("enter the game id idiot");
+            a.setTitle("TazeUploader");
+            a.show();
+            return;
+        }
+        if (GameNameBox.getText().isBlank()) {
+            Alert a = new Alert(AlertType.ERROR);
+            a.setHeaderText("enter the game name idiot");
+            a.setTitle("TazeUploader");
+            a.show();
+            return;
+        }
+        if (VersionBox.getText().isBlank()) {
+            Alert a = new Alert(AlertType.ERROR);
+            a.setHeaderText("enter the version idiot");
+            a.setTitle("TazeUploader");
+            a.show();
+            return;
+        }
+        if (ButlerExec == null) {
+            Alert a = new Alert(AlertType.ERROR);
+            a.setHeaderText("choose the butler executable idiot");
+            a.setTitle("TazeUploader");
+            a.show();
+            return;
+        }
+
         Stage stage = (Stage)((Node) event.getSource()).getScene().getWindow();
         FileChooser fileChooser = new FileChooser();
 
         fileChooser.setTitle("Select Builds");
         List<File> list = fileChooser.showOpenMultipleDialog(stage);
+        if (list == null) {return;}
         System.out.println(list);
+        List<String> strlist = new ArrayList<String>();
+        for (File file : list) {
+            strlist.add(file.getName());
+        }
+        Alert a1 = new Alert(AlertType.INFORMATION);
+        a1.setHeaderText("Uploading builds...");
+        a1.setContentText("> " + String.join(", ", strlist) + "\n");
+        a1.setResizable(true);
+        a1.show();
 
+        String commandOutput = "Command Output:\n\n";
         // double ProgressBarIncrement = (double) 1 / list.size();
         for (File file : list) {
             if (GetBuildChannel(file, GameNameBox.getText(), VersionBox.getText()) == null) {
                 Alert a = new Alert(AlertType.WARNING);
-                a.setContentText("Could not detect channel for " + file.getName());
+                a.setHeaderText("Could not detect channel for " + file.getName());
                 a.show();
                 continue;
             }
@@ -76,20 +131,36 @@ public class HelloController {
             System.out.println("Running command:\n");
             System.out.println(Arrays.toString(command));
 
-            Process proc = Runtime.getRuntime().exec(command);
+            try {
+                Process proc = Runtime.getRuntime().exec(command);
+                BufferedReader reader =
+                        new BufferedReader(new InputStreamReader(proc.getInputStream()));
 
-            BufferedReader reader =
-                    new BufferedReader(new InputStreamReader(proc.getInputStream()));
+                String line = "";
 
-            String line = "";
-            while((line = reader.readLine()) != null) {
-                System.out.print(line + "\n");
+                commandOutput += "### Uploading " + file.getName() + "\n";
+                commandOutput += "~$ " + String.join(" ", command) + "\n";
+                while((line = reader.readLine()) != null) {
+                    System.out.print(line + "\n");
+                    commandOutput += line + "\n";
+                }
+            } catch (Exception e) {
+                Alert a = new Alert(AlertType.ERROR);
+                a.setContentText(e.toString());
+                a.setHeaderText("Could not upload builds!");
+                a.setTitle("TazeUploader");
+                a.show();
+                return;
             }
-            proc.waitFor();
         }
-        Alert a = new Alert(AlertType.INFORMATION);
-        a.setContentText("Done.");
-        a.show();
+        a1.hide();
+        Alert a2 = new Alert(AlertType.INFORMATION);
+        a2.setResizable(true);
+        a2.setHeight(250);
+        a2.setTitle("TazeUploader");
+        a2.setHeaderText("Done.");
+        a2.setContentText(commandOutput);
+        a2.show();
         return;
     }
     public static String GetBuildChannel(File build, String GameName, String Version) {
