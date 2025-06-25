@@ -6,6 +6,7 @@ import javafx.fxml.FXML;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.List;
 
 import javafx.scene.control.*;
@@ -59,7 +60,7 @@ public class HelloController {
         List<File> list = fileChooser.showOpenMultipleDialog(stage);
         System.out.println(list);
 
-        double ProgressBarIncrement = 1 / list.size();
+        // double ProgressBarIncrement = (double) 1 / list.size();
         for (File file : list) {
             if (GetBuildChannel(file, GameNameBox.getText(), VersionBox.getText()) == null) {
                 Alert a = new Alert(AlertType.WARNING);
@@ -67,13 +68,14 @@ public class HelloController {
                 a.show();
                 continue;
             }
-            String command = ButlerExec.getAbsolutePath()
-                    + " push " + file.getAbsolutePath()
-                    + " " + UsernameBox.getText() + "/" + GameBox.getText()
-                    + ":" + GetBuildChannel(file, GameNameBox.getText(), VersionBox.getText())
-                    + " --userversion "
-                    + VersionBox.getText();
-            System.out.println(command);
+
+            String[] command = {ButlerExec.getAbsolutePath()
+                    ,"push", file.getAbsolutePath()
+                    ,UsernameBox.getText() + "/" + GameBox.getText() + ":" + GetBuildChannel(file, GameNameBox.getText(), VersionBox.getText())
+                    ,"--userversion",VersionBox.getText()};
+            System.out.println("Running command:\n");
+            System.out.println(Arrays.toString(command));
+
             Process proc = Runtime.getRuntime().exec(command);
 
             BufferedReader reader =
