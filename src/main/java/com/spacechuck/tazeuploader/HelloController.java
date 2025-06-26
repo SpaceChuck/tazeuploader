@@ -167,7 +167,7 @@ public class HelloController {
         java.lang.String name = build.getName();
 
         // Windows
-        if (name.equals(GameName + "v" + Version + "Setup.exe") || name == (GameName + "v" + Version + "Setup64.exe")) {
+        if (name.equals(GameName + "v" + Version + "Setup.exe") || name.equals(GameName + "v" + Version + "Setup64.exe")) {
             return "windows-64-installer";
         }
         else if (name.equals(GameName + "v" + Version + "Setup32.exe")) {
@@ -180,7 +180,7 @@ public class HelloController {
             return "windows-arm32-installer";
         }
 
-        else if (name.equals(GameName + "v" + Version + "Windows.zip") || name == (GameName + "v" + Version + "Windows64.zip")) {
+        else if (name.equals(GameName + "v" + Version + "Windows.zip") || name.equals(GameName + "v" + Version + "Windows64.zip")) {
             return "windows-64";
         }
         else if (name.equals(GameName + "v" + Version + "Windows32.zip")) {
@@ -194,7 +194,7 @@ public class HelloController {
         }
 
         // macOS
-        else if (name.equals(GameName + "v" + Version + "macOS.zip") || name == (GameName + "v" + Version + "macOSUniversal.zip")) {
+        else if (name.equals(GameName + "v" + Version + "macOS.zip") || name.equals(GameName + "v" + Version + "macOSUniversal.zip")) {
             return "mac";
         }
         else if (name.equals(GameName + "v" + Version + "macOS64.zip")) {
@@ -203,7 +203,7 @@ public class HelloController {
         else if (name.equals(GameName + "v" + Version + "macOS32.zip")) {
             return "mac-32";
         }
-        else if (name.equals(GameName + "v" + Version + "macOSPPC.zip") || name == (GameName + "v" + Version + "macOSPowerPC.zip")) {
+        else if (name.equals(GameName + "v" + Version + "macOSPPC.zip") || name.equals(GameName + "v" + Version + "macOSPowerPC.zip")) {
             return "mac-ppc";
         }
         else if (name.equals(GameName + "v" + Version + "macOSARM.zip")) {
