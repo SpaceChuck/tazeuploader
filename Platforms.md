@@ -15,7 +15,7 @@
 **macOS64.zip:** mac-64\
 **macOS32.zip:** mac-32\
 **macOSARM.zip:** mac-arm\
-**macOSPPC.zip/macOSPowerPC.zip:** mac-ppc\
+**macOSPPC.zip/macOSPowerPC.zip:** mac-ppc
 
 ## Linux
 **Linux.zip/Linux64.zip:** linux\
