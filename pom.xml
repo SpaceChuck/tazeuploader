@@ -6,7 +6,7 @@
 
     <groupId>com.spacechuck</groupId>
     <artifactId>tazeuploader</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.1</version>
     <name>TazeUploader</name>
 
     <properties>
