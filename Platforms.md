@@ -1,4 +1,5 @@
 # Supported Platform Names
+These names are not case-sensitive.
 
 ## Windows
 **Setup.exe/Setup64.exe:** windows-64-installer\
@@ -11,21 +12,21 @@
 **WindowsARM32.zip:** windows-arm32
 
 ## macOS
-**macOS.zip/macOSUniversal.zip:** mac\
-**macOS64.zip:** mac-64\
-**macOS32.zip:** mac-32\
-**macOSARM.zip:** mac-arm\
-**macOSPPC.zip/macOSPowerPC.zip:** mac-ppc
+**macOS.zip/macOSUniversal.zip/Mac.zip/MacUniversal.zip:** mac-universal\
+**macOS64.zip/Mac64.zip:** mac-64\
+**macOS32.zip/Mac32.zip:** mac-32\
+**macOSARM.zip/MacARM.zip:** mac-arm\
+**macOSPPC.zip/macOSPowerPC.zip/MacPPC.zip/MacPowerPC.zip:** mac-ppc
 
 ## Linux
-**Linux.zip/Linux64.zip:** linux\
+**Linux.zip/Linux64.zip:** linux-64\
 **Linux32.zip:** linux-32\
 **LinuxARM.zip:** linux-arm\
 **LinuxARM32.zip:** linux-arm32\
 **LinuxPPC.zip/LinuxPowerPC.zip:** linux-ppc
 
 ## Web
-**WebGL.zip/Web.zip:** webgl
+**WebGL.zip/Web.zip:** web
 
 ## Android
 **Android.apk:** android
