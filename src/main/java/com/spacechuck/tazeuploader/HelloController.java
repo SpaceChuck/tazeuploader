@@ -1,14 +1,13 @@
 package com.spacechuck.tazeuploader;
 
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Arrays;
-import java.util.List;
-import java.util.ArrayList;
+import java.util.*;
 
 import javafx.scene.control.*;
 import javafx.scene.Node;
@@ -18,9 +17,11 @@ import javafx.event.ActionEvent;
 import java.io.File;
 import javafx.scene.control.Alert.AlertType;
 
+import static java.util.Map.entry;
+
 public class HelloController {
-    @FXML
-    private ProgressBar UploadProgressBar;
+    // @FXML
+    //private ProgressBar UploadProgressBar;
     @FXML
     private ProgressBar ButlerStatusBar;
     @FXML
@@ -34,8 +35,66 @@ public class HelloController {
     @FXML
     private TextField GameNameBox;
 
-    private File ButlerExec;
+    private static Map<String,String> Platforms = Map.ofEntries(
+            entry("setup.exe", "windows-64-installer"),
+            entry("setup64.exe", "windows-64-installer"),
+            entry("setup32.exe", "windows-32-installer"),
+            entry("setuparm.exe", "windows-arm-installer"),
+            entry("setuparm32.exe", "windows-arm32-installer"),
 
+            entry("windows.zip", "windows-64"),
+            entry("windows64.zip", "windows-64"),
+            entry("windows32.zip", "windows-32"),
+            entry("windowsarm.zip", "windows-arm"),
+            entry("windowsarm32.zip", "windows-arm32"),
+
+            entry("macos.zip", "mac-universal"),
+            entry("mac.zip", "mac-universal"),
+            entry("macos64.zip", "mac-64"),
+            entry("mac64.zip", "mac-64"),
+            entry("macos32.zip", "mac-32"),
+            entry("mac32.zip", "mac-32"),
+            entry("macosarm.zip", "mac-arm"),
+            entry("macarm.zip", "mac-arm"),
+            entry("macosppc.zip", "mac-ppc"),
+            entry("macppc.zip", "mac-ppc"),
+            entry("macospowerpc.zip", "mac-ppc"),
+            entry("macpowerpc.zip", "mac-ppc"),
+
+            entry("linux.zip", "linux-64"),
+            entry("linux64.zip", "linux-64"),
+            entry("linux32.zip", "linux-32"),
+            entry("linuxarm.zip", "linux-arm"),
+            entry("linuxarm32.zip", "linux-arm32"),
+            entry("linuxppc.zip", "linux-ppc"),
+            entry("linuxpowerpc.zip", "linux-ppc"),
+
+            entry("web.zip", "web"),
+            entry("webgl.zip", "web"),
+
+            entry("android.apk", "android"),
+
+            entry("ios.ipa", "ios"),
+
+            entry("tvos.ipa", "tvos")
+
+    );
+    private File ButlerExec;
+    private Boolean ButlerInPath = false;
+
+
+    @FXML
+    protected void initialize() {
+        try {
+            Process proc = Runtime.getRuntime().exec("butler");
+            ButlerInPath = true;
+            System.out.println("Butler detected in PATH!");
+            ButlerStatusBar.setProgress(1);
+        } catch (IOException e) {
+            ButlerExec = null;
+            return;
+        }
+    }
     @FXML
     protected void onBrowseButlerButtonClick(ActionEvent event) {
         Stage stage = (Stage)((Node) event.getSource()).getScene().getWindow();
@@ -75,13 +134,6 @@ public class HelloController {
             a.show();
             return;
         }
-        if (GameNameBox.getText().isBlank()) {
-            Alert a = new Alert(AlertType.ERROR);
-            a.setHeaderText("enter the game name idiot");
-            a.setTitle("TazeUploader");
-            a.show();
-            return;
-        }
         if (VersionBox.getText().isBlank()) {
             Alert a = new Alert(AlertType.ERROR);
             a.setHeaderText("enter the version idiot");
@@ -89,7 +141,7 @@ public class HelloController {
             a.show();
             return;
         }
-        if (ButlerExec == null) {
+        if (ButlerExec == null && !ButlerInPath) {
             Alert a = new Alert(AlertType.ERROR);
             a.setHeaderText("choose the butler executable idiot");
             a.setTitle("TazeUploader");
@@ -123,8 +175,13 @@ public class HelloController {
                 a.show();
                 continue;
             }
-
-            String[] command = {ButlerExec.getAbsolutePath()
+            String butlerPath;
+            if (ButlerInPath) {
+                butlerPath = "butler";
+            } else {
+                butlerPath = ButlerExec.getAbsolutePath();
+            }
+            String[] command = {butlerPath
                     ,"push", file.getAbsolutePath()
                     ,UsernameBox.getText() + "/" + GameBox.getText() + ":" + GetBuildChannel(file, GameNameBox.getText(), VersionBox.getText())
                     ,"--userversion",VersionBox.getText()};
@@ -166,89 +223,15 @@ public class HelloController {
     public static String GetBuildChannel(File build, String GameName, String Version) {
         java.lang.String name = build.getName();
 
-        // Windows
-        if (name.equals(GameName + "v" + Version + "Setup.exe") || name.equals(GameName + "v" + Version + "Setup64.exe")) {
-            return "windows-64-installer";
-        }
-        else if (name.equals(GameName + "v" + Version + "Setup32.exe")) {
-            return "windows-32-installer";
-        }
-        else if (name.equals(GameName + "v" + Version + "SetupARM.exe") || name.equals(GameName + "v" + Version + "SetupARM64.exe")) {
-            return "windows-arm-installer";
-        }
-        else if (name.equals(GameName + "v" + Version + "SetupARM32.exe")) {
-            return "windows-arm32-installer";
-        }
 
-        else if (name.equals(GameName + "v" + Version + "Windows.zip") || name.equals(GameName + "v" + Version + "Windows64.zip")) {
-            return "windows-64";
+        for (Map.Entry<String,String> i: Platforms.entrySet()) {
+            System.out.println(name);
+            System.out.println(name.substring(name.length()-i.getKey().length()).toLowerCase());
+            System.out.println(i.getKey());
+            if (name.substring(name.length()-i.getKey().length()).toLowerCase().equals((i.getKey()))) {
+                return i.getValue();
+            }
         }
-        else if (name.equals(GameName + "v" + Version + "Windows32.zip")) {
-            return "windows-32";
-        }
-        else if (name.equals(GameName + "v" + Version + "WindowsARM.zip")) {
-            return "windows-arm";
-        }
-        else if (name.equals(GameName + "v" + Version + "WindowsARM32.zip")) {
-            return "windows-arm32";
-        }
-
-        // macOS
-        else if (name.equals(GameName + "v" + Version + "macOS.zip") || name.equals(GameName + "v" + Version + "macOSUniversal.zip")) {
-            return "mac";
-        }
-        else if (name.equals(GameName + "v" + Version + "macOS64.zip")) {
-            return "mac-64";
-        }
-        else if (name.equals(GameName + "v" + Version + "macOS32.zip")) {
-            return "mac-32";
-        }
-        else if (name.equals(GameName + "v" + Version + "macOSPPC.zip") || name.equals(GameName + "v" + Version + "macOSPowerPC.zip")) {
-            return "mac-ppc";
-        }
-        else if (name.equals(GameName + "v" + Version + "macOSARM.zip")) {
-            return "mac-arm";
-        }
-
-        // Linux
-        else if (name.equals(GameName + "v" + Version + "Linux.zip") || name == (GameName + "v" + Version + "Linux64.zip")) {
-            return "linux";
-        }
-        else if (name.equals(GameName + "v" + Version + "Linux32.zip")) {
-            return "linux-32";
-        }
-        else if (name.equals(GameName + "v" + Version + "LinuxPPC.zip") || name == (GameName + "v" + Version + "LinuxPowerPC.zip")) {
-            return "linux-ppc";
-        }
-        else if (name.equals(GameName + "v" + Version + "LinuxARM.zip")) {
-            return "linux-arm";
-        }
-        else if (name.equals(GameName + "v" + Version + "LinuxARM32.zip")) {
-            return "linux-arm32";
-        }
-
-
-        // WebGL
-        else if (name.equals(GameName + "v" + Version + "WebGL.zip") || name == (GameName + "v" + Version + "Web.zip")) {
-            return "webgl";
-        }
-
-        // Android
-        else if (name.equals(GameName + "v" + Version + "Android.apk")) {
-            return "android";
-        }
-
-        // iOS
-        else if (name.equals(GameName + "v" + Version + "iOS.ipa")) {
-            return "ios";
-        }
-
-        // tvOS
-        else if (name.equals(GameName + "v" + Version + "tvOS.ipa")) {
-            return "tvos";
-        }
-
-        // Samsung Smart Fridge (not supported, unfortunately)
-        else {return null;}
+        return null;
     }
 }
