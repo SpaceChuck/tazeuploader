@@ -225,9 +225,6 @@ public class HelloController {
 
 
         for (Map.Entry<String,String> i: Platforms.entrySet()) {
-            System.out.println(name);
-            System.out.println(name.substring(name.length()-i.getKey().length()).toLowerCase());
-            System.out.println(i.getKey());
             if (name.substring(name.length()-i.getKey().length()).toLowerCase().equals((i.getKey()))) {
                 return i.getValue();
             }
